@@ -3,15 +3,11 @@
 <head>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script>
-		axios.defaults.baseURL = 'https://16836bf6e9ec.ngrok.io';
-    </script>
-    <script src="aws-sdk-2.802.0.min.js"></script>
     <title>Sticker packs</title>
     <style>
         html,
         body,
-        #sticker-app {
+        #create-sticker-pack {
             height: 100%;
             margin: 0;
             padding: 0;
@@ -82,10 +78,47 @@
             }
         }
 
+
+        .inputfile {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .inputfile + label {
+            height: 130px;
+            width: 130px;
+            font-size: 12px;
+            display: flex;
+            border-radius: 8px;
+            padding: 8px;
+            box-sizing: border-box;
+            color: #b4b4b4;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #b4b4b4;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .inputfile:focus + label,
+        .inputfile + label:hover {
+            border-color: black;
+            color: black;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
     </style>
 </head>
 <body>
-<div id="sticker-app">
+<div id="create-sticker-pack">
     <div class="loader"></div>
 </div>
 <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
@@ -95,10 +128,9 @@
 
 <script src="/api.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
 <script src="/components/button.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
-<script src="/components/search.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
-<script src="/components/stickers.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
+<!--<script src="/components/stickers.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>-->
 <script src="/components/navigation.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
-<script src="/components/sticker-packs.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
-<script src="stickers-app.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
+<!--<script src="/components/sticker-packs.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>-->
+<script src="create-sticker-pack.js" data-plugins="transform-es2015-modules-umd" type="text/babel"></script>
 </body>
 </html>

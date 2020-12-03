@@ -1,3 +1,10 @@
+import Search from "./components/search.js"
+import Stickers from "./components/stickers"
+import Navigation, {CATEGORIES} from './components/navigation.js'
+import StickerPacks from './components/sticker-packs'
+import Button from './components/button'
+import {getStickerPacks} from "./api"
+
 const images = [
 	{src: 'img/Asset_1.svg', width: 267.02, height: 218.31},
 	{src: 'img/Asset_11.svg', width: 204.36, height: 375.54},
@@ -49,117 +56,53 @@ const images = [
 	{src: 'img/Asset_9.svg', width: 211.51, height: 246.24},
 ]
 
-function getImage(img) {
-	return `<div class="draggable-item image-box">
-						<img src="${img.src}" data-image-url="https://realtimeboard.com/api/awesome-plugins/plugins/rtb_sticker_pack/${img.src}">
-			</div>`
-}
-
-function addShapes(container) {
-	container.innerHTML += `<div class="shape draggable-item green" data-color="0ca788">I am shape</div><div class="shape draggable-item red" data-color="f24726">Me too</div>`
-}
-
-function addImages(container) {
-	container.innerHTML += images.map((i) => getImage(i)).join('')
-}
-
-function createImage(canvasX, canvasY, url) {
-	return miro.board.widgets.create({
-		type: 'image',
-		url: url,
-		x: canvasX,
-		y: canvasY,
-	})
-}
-
-const Search = () => {
-	const [searchKey, setSearchKey] = React.useState('');
-	const onInputChange = React.useCallback((e) => setSearchKey(e.target.value), [setSearchKey])
-
-	return <input
-		placeholder="Search"
-		value={searchKey}
-		onChange={onInputChange}
-		style={{padding: '4px 8px', height: '30px', border: '1px solid #d9d9d9', borderRadius: '4px', fontSize: '18px'}}
-	/>
-}
-
-const StickerItem = ({src}) => {
-	const realSrc = `https://realtimeboard.com/api/awesome-plugins/plugins/rtb_sticker_pack/${src}`;
-	return (
-		<img className="draggable-item image-box" style={{
-			flex: '1',
-			width: 'calc(50% - 20px)',
-			margin: '10px',
-		}} src={realSrc} data-image-url={realSrc}/>
-	)
-}
-
-const Stickers = ({images}) => {
-	return (
-		<div id="stickers-container"
-			 style={{margin: '0 -20px', padding: '0 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', overflow: 'scroll', height: '100%'}}>
-			{images.map((image, idx) =>
-				<StickerItem key={`sticker-item-${idx}`} src={image.src}/>
-			)}
-		</div>
-	)
-}
-
-const NavItem = ({children}) => <div style={{
-	flex: 1,
-	padding: '10px',
-	textAlign: 'center'
-}}>{children}</div>
-
-const Navigation = () => {
-	return <div style={{
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center'
-	}}>
-		<NavItem>Personal</NavItem>
-		<NavItem>Company</NavItem>
-		<NavItem>Shared</NavItem>
-	</div>
-}
-
 const StickerApp = () => {
+	const [isStickerPacksFetching, setIsStickerPacksFetching] = React.useState(false)
+	const [stickerPacks, setStickerPacks] = React.useState([])
+	const [selectedPack, setSelectedPack] = React.useState(null)
+	const [category, setCategory] = React.useState(CATEGORIES[0])
+	const onCategoryChange = React.useCallback((category) => setCategory(category), [setCategory])
+	const onStickerPackSelect = React.useCallback((pack) => setSelectedPack(pack), [setSelectedPack])
+	const resetStickerPack = React.useCallback(() => setSelectedPack(null), [setSelectedPack])
+	const filteredStickerPacks = stickerPacks.filter(stickerPack => stickerPack.category === category)
+	const openCreatePackModal = React.useCallback(() => {
+		miro.board.ui.openModal("/create-sticker-pack.html", {width: 600, height: 450}).then(() => {
+			// todo reset state ? reload stickerPacks if one was created?
+		});
+	}, [])
+
+	React.useEffect(async () => {
+		setIsStickerPacksFetching(true)
+		const stickerPacks = await getStickerPacks()
+		setStickerPacks(stickerPacks)
+		setIsStickerPacksFetching(false)
+	}, [setStickerPacks])
+
 	return <div style={{padding: '20px', display: 'flex', flexDirection: 'column', height: '100%'}}>
 		<Search/>
-		<Navigation/>
-		<Stickers images={images}/>
+		{
+			isStickerPacksFetching
+				? <div className="loader"/>
+				: selectedPack
+				? <React.Fragment>
+					<Button onClick={resetStickerPack}>Back</Button>
+					<Stickers stickerPackId={selectedPack.id}/>
+				</React.Fragment>
+				: <React.Fragment>
+					<Navigation currentCategory={category} onCategoryChange={onCategoryChange}/>
+					<StickerPacks items={filteredStickerPacks} onStickerPackSelect={onStickerPackSelect}/>
+					<Button onClick={openCreatePackModal}>
+						Create pack
+					</Button>
+				</React.Fragment>
+		}
+
 	</div>
 }
 
 function bootstrap() {
 	const domContainer = document.querySelector('#sticker-app');
 	ReactDOM.render(React.createElement(StickerApp), domContainer);
-
-	let currentImageUrl
-	const imageOptions = {
-		draggableItemSelector: 'img',
-		onClick: async (targetElement) => {
-			const url = targetElement.getAttribute('data-image-url')
-			const widget = (await createImage(0, 0, url))[0]
-			miro.board.viewport.zoomToObject(widget)
-		},
-		getDraggableItemPreview: (targetElement) => {
-			//drag-started
-			currentImageUrl = targetElement.getAttribute('data-image-url')
-			return {
-				width: 100,
-				height: 100,
-				url: currentImageUrl,
-			}
-		},
-		onDrop: (canvasX, canvasY) => {
-			console.log('onDrop 1')
-			createImage(canvasX, canvasY, currentImageUrl)
-		},
-	}
-	miro.board.ui.initDraggableItemsContainer(document.getElementById('stickers-container'), imageOptions)
 
 }
 
