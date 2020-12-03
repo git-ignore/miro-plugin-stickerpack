@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sticker packs</title>
+    <style>
+        html,
+        body,
+        #sticker-app {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .loader {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div id="sticker-app"><div class="loader"><h3>Loading...</h3></div></div>
+<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+<script src="https://miro.com/app/static/sdk.1.1.js"></script>
+<script src="stickers-app.js" type="text/babel"></script>
+</body>
+</html>
