@@ -10,14 +10,25 @@ const getCredentials = async () => {
 	}
 }
 
+const getImageServerFormat = (base64converted) => {
+	const base64ServerPart = base64converted.split('base64,')[1]
+	const extension = base64converted.split('image/')[1].split(';')[0]
+	return `${extension},${base64ServerPart}`
+}
+
+const createStickerData = (image) => ({
+	id: +new Date(),
+	image: getImageServerFormat(image)
+})
+
 export const createPack = async (packData) => {
 	const {accountId, userId} = await getCredentials()
 
 	const body = JSON.stringify({
 		title: packData.name,
 		category: packData.category,
-		image: packData.preview,
-		stickers: packData.stickers,
+		image: getImageServerFormat(packData.preview),
+		stickers: packData.stickers.map(createStickerData),
 		accountId,
 		userId
 	})
@@ -54,7 +65,7 @@ export const getStickerPacks = async () => {
 	return Promise.reject('Error HTTP')
 }
 
-export const getStickersInPack = async (stickerPackId) => {
+export const getStickerPackDetails = async (stickerPackId) => {
 	const {accountId, userId} = await getCredentials()
 
 	const response = await fetch(`${BASE_URL}/sticker-packs/${stickerPackId}?currentUserId=${userId}&accountId=${accountId}`, {
@@ -65,8 +76,7 @@ export const getStickersInPack = async (stickerPackId) => {
 	})
 
 	if (response.ok) {
-		const stickerPack = await response.json()
-		return stickerPack.stickers
+		return await response.json()
 	}
 
 	return Promise.reject('Error HTTP')

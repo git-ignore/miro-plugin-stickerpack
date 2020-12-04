@@ -2,128 +2,15 @@
 <html lang="en">
 <head>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="./create-sticker-pack.css">
     <title>Sticker packs</title>
     <style>
-        html,
-        body,
-        #create-sticker-pack {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-        }
-
-        .loader,
-        .loader:before,
-        .loader:after {
-            border-radius: 50%;
-            width: 2.5em;
-            height: 2.5em;
-            -webkit-animation-fill-mode: both;
-            animation-fill-mode: both;
-            -webkit-animation: load7 1.8s infinite ease-in-out;
-            animation: load7 1.8s infinite ease-in-out;
-        }
-
-        .loader {
-            color: #b4b4b4;
-            font-size: 4px;
-            margin: 80px auto;
-            position: relative;
-            text-indent: -9999em;
-            -webkit-transform: translateZ(0);
-            -ms-transform: translateZ(0);
-            transform: translateZ(0);
-            -webkit-animation-delay: -0.16s;
-            animation-delay: -0.16s;
-        }
-
-        .loader:before,
-        .loader:after {
-            content: '';
-            position: absolute;
-            top: 0;
-        }
-
-        .loader:before {
-            left: -3.5em;
-            -webkit-animation-delay: -0.32s;
-            animation-delay: -0.32s;
-        }
-
-        .loader:after {
-            left: 3.5em;
-        }
-
-        @-webkit-keyframes load7 {
-            0%,
-            80%,
-            100% {
-                box-shadow: 0 2.5em 0 -1.3em;
-            }
-            40% {
-                box-shadow: 0 2.5em 0 0;
-            }
-        }
-
-        @keyframes load7 {
-            0%,
-            80%,
-            100% {
-                box-shadow: 0 2.5em 0 -1.3em;
-            }
-            40% {
-                box-shadow: 0 2.5em 0 0;
-            }
-        }
-
-
-        .inputfile {
-            width: 0.1px;
-            height: 0.1px;
-            opacity: 0;
-            overflow: hidden;
-            position: absolute;
-            z-index: -1;
-        }
-
-        .inputfile + label {
-            height: 130px;
-            width: 130px;
-            font-size: 12px;
-            display: flex;
-            border-radius: 8px;
-            padding: 8px;
-            box-sizing: border-box;
-            color: #b4b4b4;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 1px dashed #b4b4b4;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .inputfile:focus + label,
-        .inputfile + label:hover {
-            border-color: black;
-            color: black;
-        }
-
-        .stickers-uploader #stickers-uploader-btn {
-            margin: 10px
-        }
-
-        * {
-            box-sizing: border-box;
-        }
 
     </style>
 </head>
 <body>
 <div id="create-sticker-pack">
-    <div class="loader"></div>
+
 </div>
 <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
 

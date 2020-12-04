@@ -2,11 +2,6 @@
 <html lang="en">
 <head>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script>
-		axios.defaults.baseURL = 'https://16836bf6e9ec.ngrok.io';
-    </script>
-    <script src="aws-sdk-2.802.0.min.js"></script>
     <title>Sticker packs</title>
     <style>
         html,
@@ -16,6 +11,7 @@
             margin: 0;
             padding: 0;
             font-family: sans-serif;
+            color: rgba(5, 0, 56, 1)
         }
 
         .loader,
@@ -82,11 +78,51 @@
             }
         }
 
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            color: rgba(66, 98, 255, 1)
+        }
+
+
+        .search-bar {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+            -ms-flex-align: center;
+            align-items: center;
+            position: relative;
+            border-bottom: 1px solid rgba(205, 204, 215, 1);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        .search-input {
+            width: 100%;
+            font-style: normal;
+            font-stretch: normal;
+            letter-spacing: normal;
+            font-family: Formular, sans-serif;
+            font-size: 16px;
+            line-height: 24px;
+            font-weight: normal;
+            border: none;
+            outline: none;
+            box-shadow: none;
+            background: transparent;
+        }
     </style>
 </head>
 <body>
 <div id="sticker-app">
-    <div class="loader"></div>
+
 </div>
 <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
 

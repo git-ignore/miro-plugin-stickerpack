@@ -1,3 +1,35 @@
+const getBgColor = (props) => {
+	if (props.disabled || props.secondary) {
+		return 'transparent'
+	}
+
+	return 'rgba(66, 98, 255, 1)'
+}
+
+const getBorderColor = (props) => {
+	if (props.disabled) {
+		return '#dfdfdf'
+	}
+
+	if (props.secondary) {
+		return '#4c4c4c'
+	}
+
+	return 'rgba(66, 98, 255, 1)'
+}
+
+const getColor = (props) => {
+	if (props.disabled) {
+		return '#a9a9a9'
+	}
+
+	if (props.secondary) {
+		return '#4c4c4c'
+	}
+
+	return '#fff'
+}
+
 export default (props) => {
 	return <button style={{
 		boxSizing: 'border-box',
@@ -11,8 +43,8 @@ export default (props) => {
 		cursor: props.disabled ? 'default' : 'pointer',
 		verticalAlign: ' middle',
 		userSelect: ' none',
-		backgroundColor: props.disabled ? 'transparent' : 'rgba(66, 98, 255, 1)',
-		borderColoer: props.disabled ? 'grey' : 'rgba(66, 98, 255, 1)',
-		color: props.disabled ? 'grey' : '#fff'
+		backgroundColor: getBgColor(props),
+		borderColor: getBorderColor(props),
+		color: getColor(props),
 	}} {...props}/>
 }

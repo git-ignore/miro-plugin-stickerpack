@@ -6,16 +6,20 @@ const StickerPackNameEditor = ({onNameChange}) => {
 	const onChange = React.useCallback((e) => {
 		onNameChange(e.target.value)
 	}, [onNameChange]);
-	return <input type="text"
-				  placeholder="Name sticker pack"
-				  style={{padding: '4px 8px', height: '30px', border: '1px solid #d9d9d9', borderRadius: '4px', fontSize: '18px'}}
-				  onChange={onChange}
-	/>
+	return (
+		<div className="name-bar">
+			<input className="name-input"
+				   type="text"
+				   placeholder="Name sticker pack"
+				   onChange={onChange}
+			/>
+		</div>
+	)
 }
 
 const StickerPackCategoryEditor = ({onCategoryChange, currentCategory}) => {
 	return (<div style={{
-		margin: '0 -10px'
+		margin: '0 -34px 0 -24px'
 	}}>
 		<Navigation onCategoryChange={onCategoryChange} currentCategory={currentCategory}/>
 	</div>)
@@ -24,11 +28,7 @@ const StickerPackCategoryEditor = ({onCategoryChange, currentCategory}) => {
 const convertToBase64 = (file, onConverted) => {
 	const reader = new FileReader();
 	reader.onloadend = function () {
-		const base64 = reader.result.split('base64,')[1]
-		const extension = reader.result.split('image/')[1].split(';')[0]
-		const res = `${extension},${base64}`
-
-		onConverted(res)
+		onConverted(reader.result)
 	};
 
 	reader.readAsDataURL(file)
@@ -43,18 +43,25 @@ const StickerPackPreviewImageEditor = ({onPreviewChange}) => {
 			convertToBase64(img, onPreviewChange)
 		}
 	}, [setImageSrc, onPreviewChange])
+	const removeImage = React.useCallback(() => {setImageSrc(null)}, [])
 
 	return (
 		<div style={{
-			width: '140px',
-			height: '140px'
+			width: '130px',
+			height: '130px',
+			position: 'relative'
 		}}>
 			{imageSrc
-				? <img style={{
-					width: '100%',
-					height: '100%',
-					borderRadius: '8px'
-				}} src={imageSrc}/>
+				? (
+					<React.Fragment>
+						<img style={{
+							width: '100%',
+							height: '100%',
+							borderRadius: '14px'
+						}} src={imageSrc}/>
+						<div className="delete-btn" onClick={removeImage}>&#x2716;</div>
+					</React.Fragment>
+				)
 				: (
 					<React.Fragment>
 						<input type="file" name="file" id="file" className="inputfile" onChange={onImageChange}/>
@@ -87,7 +94,7 @@ const StickerPackDataEditor = ({stickerPackData, updatePickerData}) => {
 			<div style={{
 				flex: 1,
 				display: 'flex',
-				flexWrap: 'wrap'
+				flexDirection: 'column'
 			}}>
 				<StickerPackNameEditor onNameChange={updateStickerPackName}/>
 				<StickerPackCategoryEditor currentCategory={stickerPackData.category} onCategoryChange={updateStickerPackCategory}/>
@@ -104,18 +111,31 @@ const StickerPackDataEditor = ({stickerPackData, updatePickerData}) => {
 }
 
 const StickersUploader = ({setStickers, stickers}) => {
-	const addFileToData = React.useCallback((sticker) => setStickers([...stickers, {id: +new Date(), image: sticker}]), [stickers, setStickers])
-	const [files, setFiles] = React.useState([])
-	const uploadMultipleFiles = React.useCallback((event) => {
-		if (event.target.files.length) {
+	const uploadMultipleFiles = React.useCallback((e) => {
+		if (e.target.files) {
+			const files = Array.from(e.target.files);
 
-			for (let i = 0; i <= event.target.files.length; i++) {
-				const img = event.target.files[i]
-				setFiles([...files, URL.createObjectURL(img)])
-				convertToBase64(img, addFileToData)
-			}
+			Promise.all(files.map(file => {
+				return (new Promise((resolve, reject) => {
+					const reader = new FileReader();
+					reader.addEventListener('load', (ev) => {
+						resolve(ev.target.result);
+					});
+					reader.addEventListener('error', reject);
+					reader.readAsDataURL(file);
+				}));
+			}))
+				.then(images => {
+					setStickers([...stickers, ...images])
+				}, error => {
+					console.error(error);
+				});
 		}
-	}, [files, stickers, setFiles, addFileToData])
+	}, [setStickers, stickers])
+
+	const deleteSticker = React.useCallback(stickerToRemove => {
+		setStickers(stickers.filter(sticker => sticker !== stickerToRemove))
+	}, [stickers, setStickers]);
 
 	return (
 		<div
@@ -124,22 +144,31 @@ const StickersUploader = ({setStickers, stickers}) => {
 				display: 'flex',
 				flexWrap: 'wrap',
 				overflow: 'scroll',
-				margin: '-10px',
+				margin: '5px -10px',
 				flex: 1
 			}}>
-			{
-				files.map((img, idx) => (
-					<img key={`uploaded-stickers-${idx}`} src={img} style={{
-						width: '130px',
-						height: '130px',
-						margin: '10px'
-					}}/>
-				))
-			}
 			<div>
-				<input type="file" name="sticker" id="sticker" accept=".jpg, .png, .jpeg, .svg, .gif" className="inputfile" onChange={uploadMultipleFiles}/>
+				<input type="file" name="sticker" id="sticker" accept=".jpg, .png, .jpeg, .svg, .gif" className="inputfile" multiple onChange={uploadMultipleFiles}/>
 				<label id="stickers-uploader-btn" htmlFor="sticker">Add sticker</label>
 			</div>
+			{
+				stickers.map((img, idx) => (
+					<div key={`uploaded-stickers-${idx}`}
+						 style={{
+							 width: '130px',
+							 height: '130px',
+							 margin: '10px',
+							 borderRadius: '14px',
+							 position: 'relative'
+						 }}>
+						<img src={img} style={{
+							width: '100%',
+							height: '100%'
+						}}/>
+						<div className="delete-btn" onClick={() => deleteSticker(img)}>&#x2716;</div>
+					</div>
+				))
+			}
 		</div>
 	)
 }
@@ -159,6 +188,8 @@ const DialogRoot = () => {
 
 	const setStickers = React.useCallback((newStickers) => updatePickerData({stickers: newStickers}), [updatePickerData])
 
+	const onClose = React.useCallback(() => miro.board.ui.closeModal(), [])
+
 	const submit = React.useCallback(async () => {
 		setIsCreationFetching(true)
 		await createPack(stickerPackData)
@@ -171,7 +202,7 @@ const DialogRoot = () => {
 			display: 'flex',
 			flexDirection: 'column',
 			height: '100%',
-			padding: '18px 24px',
+			padding: '28px 24px 20px',
 		}}>
 			<StickerPackDataEditor stickerPackData={stickerPackData} updatePickerData={updatePickerData}/>
 			<StickersUploader stickers={stickerPackData.stickers} setStickers={setStickers}/>
@@ -179,6 +210,11 @@ const DialogRoot = () => {
 				display: 'flex',
 				justifyContent: 'flex-end'
 			}}>
+				<div style={{marginRight: '10px'}}>
+					<Button onClick={onClose} secondary>
+						Cancel
+					</Button>
+				</div>
 				<Button onClick={submit} disabled={!stickerPackData.name || !stickerPackData.preview || isCreationFetching}>
 					{isCreationFetching ? 'Loading..' : 'Submit'}
 				</Button>

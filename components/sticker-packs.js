@@ -30,6 +30,7 @@ export default React.memo(({items, onStickerPackSelect}) => {
 				alignItems: 'flex-start',
 				flexWrap: 'wrap',
 				overflow: 'scroll',
+				flex: 1
 
 			}}>
 			{items.map((stickerPack, idx) =>

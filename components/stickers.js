@@ -1,10 +1,11 @@
-import {getStickersInPack} from "../api"
+import {getStickerPackDetails} from "../api"
 
 const StickerItem = ({src}) => {
 	return (
 		<img className="draggable-item image-box" style={{
 			width: 'calc(50% - 20px)',
 			margin: '10px',
+			cursor: 'grab'
 		}} src={src} data-image-url={src}/>
 	)
 }
@@ -21,7 +22,9 @@ function createImage(canvasX, canvasY, url) {
 }
 
 export default ({stickerPackId}) => {
+	const [isFetching, setIsFetching] = React.useState(false)
 	const [stickers, setStickers] = React.useState([])
+	const [details, setDetails] = React.useState({title: null, image: null})
 	React.useEffect(() => {
 		if (!stickers.length) {
 			return
@@ -53,16 +56,44 @@ export default ({stickerPackId}) => {
 	}, [stickers])
 
 	React.useEffect(async () => {
-		const stickers = await getStickersInPack(stickerPackId)
+		setIsFetching(true)
+		const {stickers, title, image} = await getStickerPackDetails(stickerPackId)
+		setDetails({title, image})
 		setStickers(stickers)
-	}, [stickerPackId])
+		setIsFetching(false)
+	}, [stickerPackId, setIsFetching, setDetails])
 
 	return (
 		<div id="stickers-container"
-			 style={{margin: '0 -20px', padding: '0 10px', display: 'flex', flexWrap: 'wrap', overflow: 'scroll'}}>
-			{stickers.map((sticker, idx) =>
-				<StickerItem key={`sticker-item-${sticker.id}`} src={sticker.image}/>
-			)}
+			 style={{margin: '20px -20px -20px', padding: '0 10px', display: 'flex', flexWrap: 'wrap', overflow: 'scroll'}}>
+			{isFetching
+				? <div className="loader"/>
+				: (
+					<React.Fragment>
+						<div style={{
+							width: '100%',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'space-around',
+							border: '1px solid lightgray',
+							borderRadius: '8px',
+							margin: '0 10px 20px',
+							padding: '10px 15px'
+						}}>
+							<img src={details.image} style={{
+								width: '80px',
+								height: '80px',
+								display: 'block'
+							}}/>
+							<span>{details.title}</span>
+						</div>
+						{stickers.map((sticker, idx) =>
+							<StickerItem key={`sticker-item-${sticker.id}`} src={sticker.image}/>
+						)}
+					</React.Fragment>
+				)
+
+			}
 		</div>
 	)
 }
