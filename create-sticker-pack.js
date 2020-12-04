@@ -99,20 +99,60 @@ const StickerPackDataEditor = ({stickerPackData, updatePickerData}) => {
 	)
 }
 
-const StickersUploader = () => {
-	return <div style={{flex: 1}}>Stickers will be placed here</div>
+const StickersUploader = ({setStickers, stickers}) => {
+	const addFileToData = React.useCallback((sticker) => setStickers([...stickers, {id: +new Date(), image: sticker}]), [stickers, setStickers])
+	const [files, setFiles] = React.useState([])
+	const uploadMultipleFiles = React.useCallback((event) => {
+		if (event.target.files.length) {
+
+			for (let i = 0; i <= event.target.files.length; i++) {
+				const img = event.target.files[i]
+				setFiles([...files, URL.createObjectURL(img)])
+				convertToBase64(img, addFileToData)
+			}
+		}
+	}, [files, stickers, setFiles, addFileToData])
+
+	return (
+		<div
+			className="stickers-uploader"
+			style={{
+				display: 'flex',
+				flexWrap: 'wrap',
+				overflow: 'scroll',
+				margin: '-10px',
+				flex: 1
+			}}>
+			{
+				files.map((img, idx) => (
+					<img key={`uploaded-stickers-${idx}`} src={img} style={{
+						width: '130px',
+						height: '130px',
+						margin: '10px'
+					}}/>
+				))
+			}
+			<div>
+				<input type="file" name="sticker" id="sticker" accept=".jpg, .png, .jpeg, .svg" className="inputfile" onChange={uploadMultipleFiles}/>
+				<label id="stickers-uploader-btn" htmlFor="sticker">Add sticker</label>
+			</div>
+		</div>
+	)
 }
 
 const DialogRoot = () => {
 	const [stickerPackData, setStickerPackData] = React.useState({
 		name: '',
 		category: CATEGORIES[0],
-		preview: null
+		preview: null,
+		stickers: []
 	})
 
 	const updatePickerData = React.useCallback((data) => {
 		setStickerPackData(Object.assign({}, stickerPackData, data))
 	}, [stickerPackData, setStickerPackData])
+
+	const setStickers = React.useCallback((newStickers) => updatePickerData({stickers: newStickers}), [updatePickerData])
 
 	const submit = React.useCallback(async () => {
 		await createPack(stickerPackData)
@@ -124,10 +164,10 @@ const DialogRoot = () => {
 			display: 'flex',
 			flexDirection: 'column',
 			height: '100%',
-			padding: '18px 24px'
+			padding: '18px 24px',
 		}}>
 			<StickerPackDataEditor stickerPackData={stickerPackData} updatePickerData={updatePickerData}/>
-			<StickersUploader/>
+			<StickersUploader stickers={stickerPackData.stickers} setStickers={setStickers}/>
 			<div style={{
 				display: 'flex',
 				justifyContent: 'flex-end'

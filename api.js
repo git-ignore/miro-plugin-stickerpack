@@ -1,4 +1,4 @@
-const BASE_URL = 'https://16836bf6e9ec.ngrok.io'
+const BASE_URL = 'https://3df623be4f18.ngrok.io'
 
 const getCredentials = async () => {
 	const account = await window.miro.account.get()
@@ -17,14 +17,7 @@ export const createPack = async (packData) => {
 		title: packData.name,
 		category: packData.category,
 		image: packData.preview,
-		"stickers": [
-			{
-				"image": "url2"
-			},
-			{
-				"image": "url3"
-			}
-		],
+		stickers: packData.stickers,
 		accountId,
 		userId
 	})

@@ -5,7 +5,7 @@ const StickerItem = ({src}) => {
 		<img className="draggable-item image-box" style={{
 			width: 'calc(50% - 20px)',
 			margin: '10px',
-		}} src={`data:image/jpeg;base64,${src}`} data-image-url={`data:image/jpeg;base64,${src}`}/>
+		}} src={src} data-image-url={src}/>
 	)
 }
 
@@ -37,6 +37,7 @@ export default ({stickerPackId}) => {
 			getDraggableItemPreview: (targetElement) => {
 				//drag-started
 				currentImageUrl = targetElement.getAttribute('data-image-url')
+				console.log("currentImageUrl", currentImageUrl)
 				return {
 					width: 100,
 					height: 100,
@@ -58,9 +59,9 @@ export default ({stickerPackId}) => {
 
 	return (
 		<div id="stickers-container"
-			 style={{margin: '0 -20px', padding: '0 10px', display: 'flex', flexWrap: 'wrap', overflow: 'scroll', height: '100%'}}>
-			{stickers.map((image, idx) =>
-				<StickerItem key={`sticker-item-${idx}`} src={image.src}/>
+			 style={{margin: '0 -20px', padding: '0 10px', display: 'flex', flexWrap: 'wrap', overflow: 'scroll'}}>
+			{stickers.map((sticker, idx) =>
+				<StickerItem key={`sticker-item-${sticker.id}`} src={sticker.image}/>
 			)}
 		</div>
 	)

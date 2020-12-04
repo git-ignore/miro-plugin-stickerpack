@@ -1,5 +1,4 @@
-export default () => {
-	const [searchKey, setSearchKey] = React.useState('');
+export default ({searchKey, setSearchKey}) => {
 	const onInputChange = React.useCallback((e) => setSearchKey(e.target.value), [setSearchKey])
 
 	return <input
