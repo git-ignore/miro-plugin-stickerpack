@@ -24,7 +24,11 @@ const StickerPackCategoryEditor = ({onCategoryChange, currentCategory}) => {
 const convertToBase64 = (file, onConverted) => {
 	const reader = new FileReader();
 	reader.onloadend = function () {
-		onConverted(reader.result.split('base64,')[1])
+		const base64 = reader.result.split('base64,')[1]
+		const extension = reader.result.split('image/')[1].split(';')[0]
+		const res = `${extension},${base64}`
+
+		onConverted(res)
 	};
 
 	reader.readAsDataURL(file)
@@ -133,7 +137,7 @@ const StickersUploader = ({setStickers, stickers}) => {
 				))
 			}
 			<div>
-				<input type="file" name="sticker" id="sticker" accept=".jpg, .png, .jpeg, .svg" className="inputfile" onChange={uploadMultipleFiles}/>
+				<input type="file" name="sticker" id="sticker" accept=".jpg, .png, .jpeg, .svg, .gif" className="inputfile" onChange={uploadMultipleFiles}/>
 				<label id="stickers-uploader-btn" htmlFor="sticker">Add sticker</label>
 			</div>
 		</div>
@@ -141,6 +145,7 @@ const StickersUploader = ({setStickers, stickers}) => {
 }
 
 const DialogRoot = () => {
+	const [isCreationFetching, setIsCreationFetching] = React.useState(false)
 	const [stickerPackData, setStickerPackData] = React.useState({
 		name: '',
 		category: CATEGORIES[0],
@@ -155,10 +160,12 @@ const DialogRoot = () => {
 	const setStickers = React.useCallback((newStickers) => updatePickerData({stickers: newStickers}), [updatePickerData])
 
 	const submit = React.useCallback(async () => {
+		setIsCreationFetching(true)
 		await createPack(stickerPackData)
-	}, [stickerPackData])
+		setIsCreationFetching(false)
+		miro.board.ui.closeModal()
+	}, [stickerPackData, setIsCreationFetching])
 
-	console.log('stickerPackData', stickerPackData)
 	return (
 		<div style={{
 			display: 'flex',
@@ -172,8 +179,8 @@ const DialogRoot = () => {
 				display: 'flex',
 				justifyContent: 'flex-end'
 			}}>
-				<Button onClick={submit} disabled={!stickerPackData.name || !stickerPackData.preview}>
-					ok
+				<Button onClick={submit} disabled={!stickerPackData.name || !stickerPackData.preview || isCreationFetching}>
+					{isCreationFetching ? 'Loading..' : 'Submit'}
 				</Button>
 			</div>
 		</div>
